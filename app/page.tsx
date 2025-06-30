@@ -34,6 +34,7 @@ export default function Home() {
     }
 
     setPrompt(inputPrompt)
+    // Iniciar explosão imediatamente para melhor responsividade
     setIsExpanded(true)
     setIsGenerating(true)
 
@@ -183,8 +184,8 @@ End Sub`
               animate={{ opacity: 1 }}
               exit={{
                 opacity: 0,
-                scale: 0.95,
-                transition: { duration: 0.5 },
+                scale: 0.98,
+                transition: { duration: 0.3 }, // Reduzido de 0.5 para 0.3
               }}
               className="flex flex-col items-center justify-center min-h-screen px-4"
             >
@@ -194,13 +195,13 @@ End Sub`
           ) : (
             <motion.div
               key="expanded"
-              initial={{ opacity: 0, y: 100 }}
+              initial={{ opacity: 0, y: 50 }}
               animate={{
                 opacity: 1,
                 y: 0,
                 transition: {
-                  duration: 1,
-                  delay: 1.5,
+                  duration: 0.6, // Reduzido de 1 para 0.6
+                  delay: 0.8, // Reduzido de 1.5 para 0.8
                   ease: [0.25, 0.46, 0.45, 0.94],
                 },
               }}
@@ -210,26 +211,26 @@ End Sub`
 
               <motion.div
                 className="max-w-7xl mx-auto mt-8 pb-8"
-                initial={{ opacity: 0, y: 50 }}
+                initial={{ opacity: 0, y: 30 }}
                 animate={{
                   opacity: 1,
                   y: 0,
                   transition: {
-                    duration: 0.8,
-                    delay: 2,
+                    duration: 0.5, // Reduzido de 0.8 para 0.5
+                    delay: 1.0, // Reduzido de 2 para 1.0
                     ease: "easeOut",
                   },
                 }}
               >
                 <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
                   <motion.div
-                    initial={{ opacity: 0, x: -100 }}
+                    initial={{ opacity: 0, x: -50 }}
                     animate={{
                       opacity: 1,
                       x: 0,
                       transition: {
-                        duration: 0.6,
-                        delay: 2.3,
+                        duration: 0.4, // Reduzido de 0.6 para 0.4
+                        delay: 1.2, // Reduzido de 2.3 para 1.2
                         ease: "easeOut",
                       },
                     }}
@@ -238,13 +239,13 @@ End Sub`
                   </motion.div>
 
                   <motion.div
-                    initial={{ opacity: 0, x: 100 }}
+                    initial={{ opacity: 0, x: 50 }}
                     animate={{
                       opacity: 1,
                       x: 0,
                       transition: {
-                        duration: 0.6,
-                        delay: 2.6,
+                        duration: 0.4, // Reduzido de 0.6 para 0.4
+                        delay: 1.4, // Reduzido de 2.6 para 1.4
                         ease: "easeOut",
                       },
                     }}
