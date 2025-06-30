@@ -6,7 +6,7 @@ interface UserUsage {
   requests: number
 }
 
-const DAILY_LIMIT = 5
+const DAILY_LIMIT = 10
 const STORAGE_KEY = 'lynx_user_usage'
 
 export class RateLimiter {
