@@ -2,11 +2,11 @@
 
 import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import Header from "./components/Header"
-import ModernSphere3D from "./components/ModernSphere3D"
-import InputSection from "./components/InputSection"
-import ChatCard from "./components/ChatCard"
-import CodeCard from "./components/CodeCard"
+import Header from "../components/Header"
+import ModernSphere3D from "../components/ModernSphere3D"
+import InputSection from "../components/InputSection"
+import ChatCard from "../components/ChatCard"
+import CodeCard from "../components/CodeCard"
 
 export default function Home() {
   const [isExpanded, setIsExpanded] = useState(false)
