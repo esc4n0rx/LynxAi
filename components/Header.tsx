@@ -12,7 +12,8 @@ import {
   Volume2,
 } from "lucide-react"
 import { useTheme } from "next-themes"
-
+import { useAuth } from "@/contexts/AuthContext"
+import UserMenu from "./UserMenu"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -29,6 +30,7 @@ import { Switch } from "@/components/ui/switch"
 
 export default function Header() {
   const { setTheme } = useTheme()
+  const { user, loading } = useAuth()
   const [soundsEnabled, setSoundsEnabled] = useState(true)
   const [animationsEnabled, setAnimationsEnabled] = useState(true)
 
@@ -52,79 +54,83 @@ export default function Header() {
           Lynx AI
         </motion.h1>
 
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <motion.button
-              whileHover={{ scale: 1.1, rotate: 90 }}
-              whileTap={{ scale: 0.95 }}
-              className="p-2 rounded-full bg-gray-800/50 hover:bg-gray-700/50 transition-colors"
-            >
-              <Settings className="w-5 h-5 text-white" />
-            </motion.button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-64" align="end" forceMount>
-            <DropdownMenuLabel className="font-normal">
-              <div className="flex flex-col space-y-1">
-                <p className="text-sm font-medium leading-none">
-                  Configurações
-                </p>
-                <p className="text-xs leading-none text-muted-foreground">
-                  Personalize a interface
-                </p>
-              </div>
-            </DropdownMenuLabel>
-            <DropdownMenuSeparator />
+        <div className="flex items-center gap-3">
+          {!loading && user && <UserMenu />}
 
-            <DropdownMenuSub>
-              <DropdownMenuSubTrigger>
-                <Palette className="w-4 h-4 mr-2 text-purple-400" />
-                <span>Tema</span>
-              </DropdownMenuSubTrigger>
-              <DropdownMenuPortal>
-                <DropdownMenuSubContent>
-                  <DropdownMenuItem onClick={() => setTheme("light")}>
-                    <Sun className="mr-2 h-4 w-4" />
-                    <span>Claro</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setTheme("dark")}>
-                    <Moon className="mr-2 h-4 w-4" />
-                    <span>Escuro</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setTheme("system")}>
-                    <Laptop className="mr-2 h-4 w-4" />
-                    <span>Sistema</span>
-                  </DropdownMenuItem>
-                </DropdownMenuSubContent>
-              </DropdownMenuPortal>
-            </DropdownMenuSub>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <motion.button
+                whileHover={{ scale: 1.1, rotate: 90 }}
+                whileTap={{ scale: 0.95 }}
+                className="p-2 rounded-full bg-gray-800/50 hover:bg-gray-700/50 transition-colors"
+              >
+                <Settings className="w-5 h-5 text-white" />
+              </motion.button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-64" align="end" forceMount>
+              <DropdownMenuLabel className="font-normal">
+                <div className="flex flex-col space-y-1">
+                  <p className="text-sm font-medium leading-none">
+                    Configurações
+                  </p>
+                  <p className="text-xs leading-none text-muted-foreground">
+                    Personalize a interface
+                  </p>
+                </div>
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
 
-            <DropdownMenuItem
-              onSelect={(e) => e.preventDefault()}
-              className="flex items-center"
-            >
-              <Volume2 className="w-4 h-4 mr-2 text-purple-400" />
-              <span>Sons</span>
-              <Switch
-                className="ml-auto"
-                checked={soundsEnabled}
-                onCheckedChange={setSoundsEnabled}
-              />
-            </DropdownMenuItem>
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger>
+                  <Palette className="w-4 h-4 mr-2 text-purple-400" />
+                  <span>Tema</span>
+                </DropdownMenuSubTrigger>
+                <DropdownMenuPortal>
+                  <DropdownMenuSubContent>
+                    <DropdownMenuItem onClick={() => setTheme("light")}>
+                      <Sun className="mr-2 h-4 w-4" />
+                      <span>Claro</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setTheme("dark")}>
+                      <Moon className="mr-2 h-4 w-4" />
+                      <span>Escuro</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setTheme("system")}>
+                      <Laptop className="mr-2 h-4 w-4" />
+                      <span>Sistema</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuSubContent>
+                </DropdownMenuPortal>
+              </DropdownMenuSub>
 
-            <DropdownMenuItem
-              onSelect={(e) => e.preventDefault()}
-              className="flex items-center"
-            >
-              <Monitor className="w-4 h-4 mr-2 text-purple-400" />
-              <span>Animações</span>
-              <Switch
-                className="ml-auto"
-                checked={animationsEnabled}
-                onCheckedChange={setAnimationsEnabled}
-              />
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+              <DropdownMenuItem
+                onSelect={(e) => e.preventDefault()}
+                className="flex items-center"
+              >
+                <Volume2 className="w-4 h-4 mr-2 text-purple-400" />
+                <span>Sons</span>
+                <Switch
+                  className="ml-auto"
+                  checked={soundsEnabled}
+                  onCheckedChange={setSoundsEnabled}
+                />
+              </DropdownMenuItem>
+
+              <DropdownMenuItem
+                onSelect={(e) => e.preventDefault()}
+                className="flex items-center"
+              >
+                <Monitor className="w-4 h-4 mr-2 text-purple-400" />
+                <span>Animações</span>
+                <Switch
+                  className="ml-auto"
+                  checked={animationsEnabled}
+                  onCheckedChange={setAnimationsEnabled}
+                />
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </div>
     </motion.header>
   )
