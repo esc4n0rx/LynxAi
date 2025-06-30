@@ -40,7 +40,7 @@ interface ArceeMessage {
             model: 'auto',
             messages,
             temperature: 0.7,
-            max_tokens: 2000,
+            max_tokens: 2500,
           }),
         })
   
@@ -83,101 +83,155 @@ interface ArceeMessage {
   
   DIRETRIZES FUNDAMENTAIS:
   
-  1. SIMPLICIDADE E FUNCIONALIDADE:
-     - Gere código VBA funcional e testado
-     - Evite complexidade desnecessária
-     - Use variáveis com nomes descritivos
-     - Inclua comentários explicativos em português
+  1. **FORMATO DE RESPOSTA OBRIGATÓRIO:**
+     Sua resposta DEVE seguir EXATAMENTE este formato Markdown:
   
-  2. SEGURANÇA E BOAS PRÁTICAS:
+     ## 📋 Análise da Solicitação
+     [Breve análise do que foi pedido]
+  
+     ## 🎯 Funcionalidade
+     [Explicação clara do que o código faz]
+  
+     ## 📝 Como Aplicar
+     1. **Abrir o Editor VBA:** Pressione \`Alt+F11\` no Excel
+     2. **Criar Módulo:** Clique em \`Inserir → Módulo\`
+     3. **Colar Código:** Cole o código gerado no módulo
+     4. **Executar:** Pressione \`F5\` ou \`Alt+F8\` para executar
+  
+     ## ⚙️ Configurações Necessárias
+     [Mencione qualquer configuração especial, se houver]
+  
+     ## 💡 Dicas de Uso
+     - [Dica 1]
+     - [Dica 2]
+     - [Dica 3]
+  
+     ## 🔧 Personalização
+     [Como o usuário pode adaptar o código para suas necessidades]
+  
+     ## ⚠️ Observações Importantes
+     [Avisos sobre backup, testes, etc.]
+  
+  2. **QUALIDADE DO CÓDIGO:**
      - Sempre use "Option Explicit" quando relevante
-     - Inclua tratamento básico de erros
-     - Valide entradas quando necessário
+     - Inclua tratamento básico de erros com \`On Error\`
+     - Use variáveis com nomes descritivos em português
+     - Adicione comentários explicativos
      - Use "Set objeto = Nothing" para limpeza de memória
+     - Valide entradas quando necessário
   
-  3. DIDÁTICA PARA USUÁRIOS LEIGOS:
-     - Explique PASSO A PASSO como aplicar o código
-     - Inclua instruções de onde colar o código (módulo, planilha, etc.)
-     - Mencione requisitos ou dependências
-     - Adicione dicas de troubleshooting básico
+  3. **SEGURANÇA E BOAS PRÁTICAS:**
+     - Evite operações que possam causar perda de dados
+     - Sempre sugira backup antes de executar
+     - Use \`Application.ScreenUpdating = False\` para otimização
+     - Implemente confirmações para ações críticas
   
-  4. ESTRUTURA DA RESPOSTA:
-     Sua resposta DEVE seguir exatamente este formato:
+  4. **DIDÁTICA:**
+     - Explique conceitos técnicos de forma simples
+     - Use exemplos práticos
+     - Forneça alternativas quando possível
+     - Inclua troubleshooting básico
   
-     EXPLICAÇÃO:
-     [Explicação clara do que o código faz e como aplicar]
-  
-     CÓDIGO:
+  5. **ESTRUTURA DO CÓDIGO:**
+     Sempre estruture o código VBA desta forma:
      \`\`\`vba
-     [Código VBA aqui]
+     Option Explicit ' Se aplicável
+     
+     Sub NomeProcedimento()
+         ' Declaração de variáveis
+         Dim var1 As String
+         Dim var2 As Integer
+         
+         ' Configurações iniciais
+         Application.ScreenUpdating = False
+         
+         ' Tratamento de erros
+         On Error GoTo TrataErro
+         
+         ' Lógica principal aqui
+         ' [Código funcional]
+         
+         ' Limpeza e finalização
+         Application.ScreenUpdating = True
+         MsgBox "Operação concluída com sucesso!"
+         Exit Sub
+         
+     TrataErro:
+         Application.ScreenUpdating = True
+         MsgBox "Erro: " & Err.Description
+     End Sub
      \`\`\`
   
-  5. TIPOS DE CÓDIGO PREFERIDOS:
+  6. **TIPOS DE CÓDIGO PREFERIDOS:**
      - Manipulação de dados em Excel
      - Automação de tarefas repetitivas
      - Formulários simples
-     - Relatórios básicos
-     - Validação de dados
+     - Relatórios e dashboards
+     - Validação e formatação de dados
+     - Importação/exportação de dados
   
-  6. EVITAR:
-     - Código que acesse sistemas externos sem explicar
-     - Manipulação de arquivos de sistema
-     - Código que possa causar perda de dados
-     - Loops infinitos ou código mal otimizado
+  7. **MARKDOWN OBRIGATÓRIO:**
+     - Use **negrito** para destacar pontos importantes
+     - Use \`código inline\` para nomes de variáveis e comandos
+     - Use listas numeradas para passos sequenciais
+     - Use listas com bullets para dicas e observações
+     - Use emojis para tornar mais visual e amigável
   
-  EXEMPLO DE RESPOSTA IDEAL:
+  **EXEMPLO DE RESPOSTA PERFEITA:**
   
-  EXPLICAÇÃO:
-  Este código cria uma lista numerada na coluna A, útil para organizar dados. Para usar:
-  1. Abra o Excel e pressione Alt+F11
-  2. Clique em Inserir > Módulo
-  3. Cole o código abaixo
-  4. Feche o editor (Alt+Q)
-  5. Execute com Alt+F8, escolha "CriarLista" e clique Executar
+  ## 📋 Análise da Solicitação
+  Você solicitou um código para criar uma lista numerada, que é útil para organização de dados e criação de índices automáticos.
   
-  CÓDIGO:
-  \`\`\`vba
-  Sub CriarLista()
-      ' Declara variáveis
-      Dim i As Integer
-      Dim ws As Worksheet
-      
-      ' Define a planilha ativa
-      Set ws = ActiveSheet
-      
-      ' Cria lista de 1 a 10
-      For i = 1 To 10
-          ws.Cells(i, 1).Value = "Item " & i
-      Next i
-      
-      ' Limpa memória
-      Set ws = Nothing
-      
-      MsgBox "Lista criada com sucesso!"
-  End Sub
-  \`\`\`
+  ## 🎯 Funcionalidade
+  Este código VBA cria automaticamente uma lista numerada na **coluna A** da planilha ativa, inserindo valores sequenciais de "Item 1" até "Item 10".
   
-  Sempre mantenha este padrão de qualidade e didática.`
+  ## 📝 Como Aplicar
+  1. **Abrir o Editor VBA:** Pressione \`Alt+F11\` no Excel
+  2. **Criar Módulo:** Clique em \`Inserir → Módulo\`
+  3. **Colar Código:** Cole o código gerado no módulo
+  4. **Executar:** Pressione \`F5\` ou \`Alt+F8\`, escolha "CriarLista" e clique "Executar"
+  
+  ## ⚙️ Configurações Necessárias
+  - Excel com macros habilitadas
+  - Nenhuma configuração especial necessária
+  
+  ## 💡 Dicas de Uso
+  - **Personalize o intervalo:** Altere os valores \`1 To 10\` para definir quantos itens criar
+  - **Mude a coluna:** Substitua \`Cells(i, 1)\` por \`Cells(i, 2)\` para usar a coluna B
+  - **Texto personalizado:** Modifique \`"Item "\` para qualquer texto desejado
+  
+  ## 🔧 Personalização
+  Para criar **50 itens** em vez de 10, altere esta linha:
+  \`For i = 1 To 50\`
+  
+  Para usar texto diferente:
+  \`ws.Cells(i, 1).Value = "Produto " & i\`
+  
+  ## ⚠️ Observações Importantes
+  - **Faça backup** da planilha antes de executar
+  - O código **substitui** dados existentes na coluna A
+  - Teste primeiro em uma planilha vazia
+  
+  Sempre mantenha este padrão de qualidade, didática e formatação em Markdown.`
     }
   
     private formatVBAUserPrompt(prompt: string): string {
-      return `O usuário solicitou: "${prompt}"
+      return `**SOLICITAÇÃO DO USUÁRIO:**
+  "${prompt}"
   
-  Por favor, gere código VBA seguindo as diretrizes do sistema. Lembre-se de:
-  - Fazer código funcional e didático
-  - Explicar como aplicar passo a passo
-  - Incluir comentários no código
-  - Manter simplicidade sem perder funcionalidade
+  **INSTRUÇÕES:**
+  1. Gere código VBA funcional e testado para esta solicitação
+  2. Formate sua resposta EXATAMENTE no padrão Markdown especificado no sistema
+  3. Seja didático e inclua todas as seções obrigatórias
+  4. Use emojis e formatação para tornar a resposta mais amigável
+  5. Garanta que o código seja seguro e inclua tratamento de erros
+  6. Foque na facilidade de uso para iniciantes
   
-  Responda EXATAMENTE no formato especificado (EXPLICAÇÃO: seguido de CÓDIGO: com \`\`\`vba).`
+  **LEMBRE-SE:** A resposta deve começar com "## 📋 Análise da Solicitação" e seguir exatamente o formato Markdown especificado.`
     }
   
     private parseVBAResponse(response: string): { explanation: string; code: string } {
       try {
-        // Procura por EXPLICAÇÃO:
-        const explanationMatch = response.match(/EXPLICAÇÃO:\s*([\s\S]*?)(?=CÓDIGO:|$)/i)
-        const explanation = explanationMatch?.[1]?.trim() || 'Código VBA gerado com sucesso.'
-  
         // Procura por código VBA entre ```vba e ```
         const codeMatch = response.match(/```vba\s*([\s\S]*?)\s*```/i)
         let code = codeMatch?.[1]?.trim() || ''
@@ -188,38 +242,39 @@ interface ArceeMessage {
           code = generalCodeMatch?.[1]?.trim() || ''
         }
   
-        // Se ainda não encontrou código, usa uma parte da resposta
-        if (!code) {
-          // Procura por CÓDIGO:
-          const codeOnlyMatch = response.match(/CÓDIGO:\s*([\s\S]*)/i)
-          code = codeOnlyMatch?.[1]?.trim() || response.trim()
-        }
-  
         // Fallback para código básico se nada foi encontrado
         if (!code || code.length < 10) {
-          code = `Sub CodigoGerado()
-      ' Código gerado pelo Lynx AI
-      ' Baseado na solicitação: ${response.substring(0, 50)}...
-      
-      MsgBox "Olá! Este é um código VBA básico."
-      
-  End Sub`
+          code = `Option Explicit
+
+Sub CodigoPersonalizado()
+    ' Código gerado pelo Lynx AI
+    ' Solicitação: ${response.substring(0,50)}...
+    Dim ws As Worksheet
+    Set ws = ActiveSheet
+
+    ' Sua lógica personalizada aqui
+    MsgBox "Código VBA gerado com base na sua solicitação!"
+
+    ' Limpeza
+    Set ws = Nothing
+End Sub`
         }
-  
+        // Remove o código da explicação para evitar duplicação
+        let explanation = response.replace(/```vba[\s\S]*?```/gi, '').replace(/```[\s\S]*?```/g, '').trim()
+        
+        // Se a explicação estiver vazia, cria uma explicação padrão
+        if (!explanation || explanation.length < 20) {
+          explanation = `## 📋 Análise da Solicitação\nCódigo VBA personalizado gerado com base na sua solicitação.\n\n🎯 Funcionalidade\nEste código executa a funcionalidade solicitada de forma segura e eficiente.\n\n📝 Como Aplicar\n\n- Abrir o Editor VBA: Pressione \`Alt+F11\` no Excel\n- Criar Módulo: Clique em \`Inserir → Módulo\`\n- Colar Código: Cole o código gerado no módulo\n- Executar: Pressione \`F5\` para executar\n\n💡 Dicas de Uso\n- Teste primeiro em uma planilha de exemplo\n- Faça backup dos seus dados antes de executar\n- Personalize as variáveis conforme necessário\n\n⚠️ Observações Importantes\n- Certifique-se de que as macros estejam habilitadas\n- Teste o código em um ambiente seguro primeiro`
+        }
         return {
-          explanation: explanation || 'Código VBA gerado. Siga as instruções para aplicar.',
-          code: code
+          explanation,
+          code
         }
       } catch (error) {
         console.error('Error parsing VBA response:', error)
         return {
-          explanation: 'Código VBA gerado com sucesso. Pressione Alt+F11 no Excel para abrir o editor VBA e cole o código em um novo módulo.',
-          code: `Sub CodigoPersonalizado()
-      ' Código gerado pelo Lynx AI
-      
-      MsgBox "Código VBA funcional gerado!"
-      
-  End Sub`
+          explanation: `## 📋 Análise da Solicitação\n\n\nCódigo VBA gerado com sucesso para sua solicitação.\n\n🎯 Funcionalidade\nEste código executa a tarefa solicitada de forma funcional e segura.\n\n📝 Como Aplicar\n\n- Abrir o Editor VBA: Pressione \`Alt+F11\` no Excel\n- Criar Módulo: Clique em \`Inserir → Módulo\`\n- Colar Código: Cole o código abaixo no módulo\n- Executar: Pressione \`F5\` para executar\n\n💡 Dicas de Uso\n- Faça backup da planilha antes de executar\n- Teste primeiro em dados de exemplo\n- Customize conforme suas necessidades\n\n⚠️ Observações Importantes\n- Certifique-se de que as macros estejam habilitadas\n- O código foi otimizado para iniciantes`,
+          code: `Option Explicit\n\nSub CodigoPersonalizado()\n    ' Código gerado pelo Lynx AI\n    Dim ws As Worksheet\n    Set ws = ActiveSheet\n    ' Desabilita atualização de tela para performance\n    Application.ScreenUpdating = False\n\n    ' Sua lógica personalizada aqui\n    MsgBox "Código VBA funcional gerado pelo Lynx AI!"\n\n    ' Restaura configurações\n    Application.ScreenUpdating = True\n\n    ' Limpeza de memória\n    Set ws = Nothing\nEnd Sub`
         }
       }
     }

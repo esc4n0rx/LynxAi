@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import { useEffect, useState } from "react"
 import { PrismLight as SyntaxHighlighter } from "react-syntax-highlighter"
 import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism"
-import { Copy, Download, Check, Loader2, BookOpen } from "lucide-react"
+import { Copy, Download, Check, Loader2, BookOpen, Play } from "lucide-react"
 import vbnet from "react-syntax-highlighter/dist/esm/languages/prism/vbnet"
 import javascript from "react-syntax-highlighter/dist/esm/languages/prism/javascript"
 
@@ -43,7 +43,7 @@ export default function CodeCard({
         clearInterval(timer)
         setIsTyping(false)
       }
-    }, 15)
+    }, 8)
 
     return () => {
       clearInterval(timer)
@@ -76,12 +76,15 @@ export default function CodeCard({
       initial={{ opacity: 0, y: 20, scale: 0.95 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{ duration: 0.5, ease: "easeOut" }}
-      className="relative bg-black/50 backdrop-blur-lg border border-gray-700/50 rounded-2xl p-6 h-96 overflow-hidden group flex flex-col"
+      className="relative bg-black/50 backdrop-blur-lg border border-gray-700/50 rounded-2xl p-6 h-[600px] overflow-hidden group flex flex-col"
     >
       <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-blue-500/10 via-transparent to-teal-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
       <div className="flex justify-between items-center mb-4 shrink-0 z-10">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-600 to-teal-600 flex items-center justify-center">
+            <BookOpen className="text-white w-4 h-4" />
+          </div>
           <h3 className="text-xl font-semibold text-white">Código VBA Gerado</h3>
           {isGenerating && (
             <motion.div
@@ -136,13 +139,7 @@ export default function CodeCard({
         </div>
       </div>
 
-      <div
-        className="h-full overflow-y-auto flex-grow z-10"
-        style={{
-          scrollbarWidth: "thin",
-          scrollbarColor: "rgba(156, 163, 175, 0.5) transparent",
-        }}
-      >
+      <div className="flex-1 overflow-hidden z-10 flex flex-col">
         {isGenerating && !code ? (
           <div className="flex items-center justify-center h-full">
             <div className="text-center">
@@ -151,41 +148,46 @@ export default function CodeCard({
                 transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
                 className="w-8 h-8 border-2 border-blue-400 border-t-transparent rounded-full mx-auto mb-4"
               />
-              <p className="text-gray-300">Gerando código VBA...</p>
+              <p className="text-gray-300">Gerando código VBA personalizado...</p>
+              <p className="text-gray-400 text-sm mt-2">Aguarde alguns instantes</p>
             </div>
           </div>
         ) : code || displayedCode ? (
-          <SyntaxHighlighter
-            language={language === "vba" ? "vbnet" : language}
-            style={vscDarkPlus}
-            customStyle={{
-              background: "transparent",
-              margin: 0,
-              padding: "0.5rem 0",
-              height: "100%",
-              fontSize: "0.875rem",
-            }}
-            codeTagProps={{
-              style: {
-                fontFamily: "'Fira Code', 'Cascadia Code', 'JetBrains Mono', monospace",
-              },
-            }}
-            wrapLines={true}
-            wrapLongLines={true}
-            showLineNumbers={true}
-            lineNumberStyle={{
-              color: "#6b7280",
-              fontSize: "0.75rem",
-              paddingRight: "1rem",
-            }}
-          >
-            {displayedCode}
-          </SyntaxHighlighter>
+          <div className="h-full overflow-y-auto scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800">
+            <SyntaxHighlighter
+              language={language === "vba" ? "vbnet" : language}
+              style={vscDarkPlus}
+              customStyle={{
+                background: "transparent",
+                margin: 0,
+                padding: "1rem 0",
+                minHeight: "100%",
+                fontSize: "0.875rem",
+              }}
+              codeTagProps={{
+                style: {
+                  fontFamily: "'Fira Code', 'Cascadia Code', 'JetBrains Mono', monospace",
+                },
+              }}
+              wrapLines={true}
+              wrapLongLines={true}
+              showLineNumbers={true}
+              lineNumberStyle={{
+                color: "#6b7280",
+                fontSize: "0.75rem",
+                paddingRight: "1rem",
+                minWidth: "3rem",
+              }}
+            >
+              {displayedCode}
+            </SyntaxHighlighter>
+          </div>
         ) : (
           <div className="flex items-center justify-center h-full text-gray-400">
             <div className="text-center">
-              <BookOpen className="w-12 h-12 mx-auto mb-4 opacity-50" />
-              <p>Aguardando geração do código...</p>
+              <Play className="w-12 h-12 mx-auto mb-4 opacity-50" />
+              <p className="text-lg">Aguardando geração do código...</p>
+              <p className="text-sm mt-2">Digite sua solicitação para começar</p>
             </div>
           </div>
         )}
@@ -195,12 +197,13 @@ export default function CodeCard({
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mt-4 pt-4 border-t border-gray-700/50 text-xs text-gray-400 z-10"
+          className="mt-4 pt-4 border-t border-gray-700/50 text-xs text-gray-400 z-10 shrink-0"
         >
-          <div className="flex items-center gap-2">
-            <BookOpen className="w-3 h-3" />
-            <span>
-              Para usar: Pressione Alt+F11 no Excel → Inserir → Módulo → Cole o código → Execute com F5
+          <div className="flex items-center gap-2 flex-wrap">
+            <BookOpen className="w-3 h-3 shrink-0" />
+            <span className="leading-relaxed">
+              <strong className="text-blue-400">Como usar:</strong> Pressione <kbd className="px-1 py-0.5 bg-gray-700 rounded">Alt+F11</kbd> no Excel → 
+              <strong> Inserir</strong> → <strong>Módulo</strong> → Cole o código → Execute com <kbd className="px-1 py-0.5 bg-gray-700 rounded">F5</kbd>
             </span>
           </div>
         </motion.div>

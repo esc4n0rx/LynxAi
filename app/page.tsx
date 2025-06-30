@@ -57,7 +57,7 @@ export default function Home() {
       // Add initial AI response
       const initialAiMessage: Message = {
         id: Date.now() + 1,
-        text: "Analisando sua solicitação e gerando código VBA personalizado...",
+        text: "## 🔄 Processando Solicitação\n\nAnalisando sua solicitação e preparando código VBA personalizado...\n\n**Status:** Conectando com IA especializada em VBA\n\n⏳ **Aguarde alguns instantes**",
         isUser: false,
         timestamp: new Date()
       }
@@ -82,14 +82,30 @@ export default function Home() {
 
       setGeneratedCode(code)
       
-      toast.success("Código VBA gerado com sucesso!")
+      toast.success("✅ Código VBA gerado com sucesso!")
       
     } catch (error) {
       console.error('Error generating code:', error)
       
       const errorMessage: Message = {
         id: Date.now() + 3,
-        text: "Desculpe, ocorreu um erro ao gerar o código. Tente novamente em alguns instantes.",
+        text: `## ⚠️ Erro na Geração
+
+Desculpe, ocorreu um erro ao gerar o código personalizado. 
+
+## 🔄 O que aconteceu?
+- Possível instabilidade temporária na conexão com a IA
+- Sobrecarga do servidor de processamento
+
+## 💡 Soluções
+1. **Tente novamente** em alguns instantes
+2. **Reformule** sua solicitação de forma mais específica  
+3. **Aguarde** alguns minutos antes de tentar novamente
+
+## 🛠️ Código de Fallback
+Um código básico foi gerado para você começar. Você pode personalizá-lo conforme sua necessidade.
+
+**Não se preocupe!** Seu contador de requests não foi afetado por este erro.`,
         isUser: false,
         timestamp: new Date()
       }
@@ -101,28 +117,54 @@ export default function Home() {
       })
 
       // Generate fallback code
-      const fallbackCode = `Sub CodigoPersonalizado()
+      const fallbackCode = `Option Explicit
+
+Sub CodigoPersonalizado()
     ' Código VBA para: ${inputPrompt}
     ' Gerado pelo Lynx AI
     
     Dim ws As Worksheet
+    Dim i As Integer
+    
+    ' Define a planilha ativa
     Set ws = ActiveSheet
     
-    ' Sua lógica personalizada aqui
-    MsgBox "Código gerado com base em: ${inputPrompt}"
+    ' Desabilita atualização de tela para performance
+    Application.ScreenUpdating = False
     
-    ' Exemplo de loop simples
-    Dim i As Integer
+    ' Tratamento de erro básico
+    On Error GoTo TrataErro
+    
+    ' === SUA LÓGICA PERSONALIZADA AQUI ===
+    ' Baseado na solicitação: ${inputPrompt}
+    
+    ' Exemplo: Loop simples para demonstração
     For i = 1 To 5
-        ws.Cells(i, 1).Value = "Item " & i
+        ws.Cells(i, 1).Value = "Item " & i & " - " & "${inputPrompt.substring(0, 20)}..."
     Next i
     
+    ' === FIM DA LÓGICA PERSONALIZADA ===
+    
+    ' Restaura configurações
+    Application.ScreenUpdating = True
+    
+    ' Mensagem de sucesso
+    MsgBox "Operação concluída com sucesso!" & vbNewLine & _
+           "Verifique os resultados na planilha.", vbInformation, "Lynx AI"
+    
+    ' Limpeza de memória
+    Set ws = Nothing
+    Exit Sub
+    
+TrataErro:
+    Application.ScreenUpdating = True
+    MsgBox "Erro durante execução: " & Err.Description, vbCritical, "Erro VBA"
     Set ws = Nothing
 End Sub`
 
       setGeneratedCode(fallbackCode)
       
-      toast.error("Erro na geração. Um código base foi criado para você.")
+      toast.error("❌ Erro na geração. Código base criado para você.")
     } finally {
       setIsGenerating(false)
     }
@@ -167,7 +209,7 @@ End Sub`
               <ModernSphere3D isExpanded={true} />
 
               <motion.div
-                className="max-w-7xl mx-auto mt-8"
+                className="max-w-7xl mx-auto mt-8 pb-8"
                 initial={{ opacity: 0, y: 50 }}
                 animate={{
                   opacity: 1,
@@ -179,7 +221,7 @@ End Sub`
                   },
                 }}
               >
-                <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 h-[600px]">
+                <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
                   <motion.div
                     initial={{ opacity: 0, x: -100 }}
                     animate={{
