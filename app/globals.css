@@ -86,30 +86,60 @@
   }
 }
 
-/* Custom scrollbar */
+/* Scrollbar otimizada para melhor visibilidade */
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 8px;
 }
 
 ::-webkit-scrollbar-track {
   background: #1a1a1a;
+  border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb {
   background: #404040;
-  border-radius: 3px;
+  border-radius: 4px;
+  border: 1px solid #2a2a2a;
 }
 
 ::-webkit-scrollbar-thumb:hover {
   background: #606060;
 }
 
-/* Smooth scrolling */
+::-webkit-scrollbar-thumb:active {
+  background: #808080;
+}
+
+/* Scrollbar para Firefox */
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: #404040 #1a1a1a;
+}
+
+/* Smooth scrolling global */
 html {
+  scroll-behavior: smooth;
+}
+
+/* Otimizações para scroll suave em containers */
+.overflow-y-auto {
   scroll-behavior: smooth;
 }
 
 /* Custom focus styles */
 *:focus {
   outline: none;
+}
+
+/* Quebra de palavra para texto longo */
+.break-words {
+  word-wrap: break-word;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+/* Melhorar renderização de texto */
+.prose {
+  overflow-wrap: break-word;
+  word-break: break-word;
 }

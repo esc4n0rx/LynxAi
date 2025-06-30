@@ -12,19 +12,20 @@ const containerVariants = {
   visible: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.2,
+      staggerChildren: 0.1, // Reduzido de 0.2 para 0.1
     },
   },
 }
 
 const itemVariants = {
-  hidden: { opacity: 0, y: 20 },
+  hidden: { opacity: 0, y: 10 }, // Reduzido de y: 20 para y: 10
   visible: {
     opacity: 1,
     y: 0,
     transition: {
       type: "spring" as const,
-      stiffness: 100,
+      stiffness: 150, // Aumentado de 100 para 150
+      damping: 20, // Adicionado damping para suavizar
     },
   },
 }
@@ -37,11 +38,16 @@ interface ChatCardProps {
 export default function ChatCard({ messages, isGenerating = false }: ChatCardProps) {
   const scrollRef = useRef<HTMLDivElement>(null)
 
+  // Scroll automático otimizado
   useEffect(() => {
     if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight
+      const scrollContainer = scrollRef.current
+      scrollContainer.scrollTo({
+        top: scrollContainer.scrollHeight,
+        behavior: 'smooth'
+      })
     }
-  }, [messages])
+  }, [messages, isGenerating])
 
   return (
     <motion.div
@@ -67,15 +73,18 @@ export default function ChatCard({ messages, isGenerating = false }: ChatCardPro
         )}
       </div>
 
+      {/* Container principal com scroll otimizado */}
       <div
-        ref={scrollRef}
-        className="flex-1 overflow-y-auto space-y-4 pr-2 scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800"
+        className="flex-1 overflow-y-auto overflow-x-hidden space-y-4 pr-2 scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800"
+        style={{
+          maxHeight: 'calc(100% - 60px)', // 60px é aproximadamente a altura do header
+        }}
       >
         <motion.div
           variants={containerVariants}
           initial="hidden"
           animate="visible"
-          className="space-y-4 min-h-full"
+          className="space-y-4"
         >
           {messages.map((message) => (
             <motion.div
@@ -92,14 +101,14 @@ export default function ChatCard({ messages, isGenerating = false }: ChatCardPro
                 </div>
               )}
               <div
-                className={`max-w-[85%] p-4 rounded-xl ${
+                className={`max-w-[85%] p-4 rounded-xl break-words ${
                   message.isUser
                     ? "bg-blue-600/50 text-white rounded-br-none"
                     : "bg-gray-800 text-white rounded-bl-none"
                 }`}
               >
                 {message.isUser ? (
-                  <TypewriterText text={message.text} speed={20} />
+                  <TypewriterText text={message.text} speed={15} />
                 ) : (
                   <div className="prose prose-invert prose-sm max-w-none">
                     <ReactMarkdown
@@ -108,24 +117,24 @@ export default function ChatCard({ messages, isGenerating = false }: ChatCardPro
                         h1: ({ children }) => <h1 className="text-lg font-bold text-purple-300 mb-2">{children}</h1>,
                         h2: ({ children }) => <h2 className="text-base font-semibold text-blue-300 mb-2">{children}</h2>,
                         h3: ({ children }) => <h3 className="text-sm font-semibold text-green-300 mb-1">{children}</h3>,
-                        p: ({ children }) => <p className="text-gray-100 mb-2 leading-relaxed">{children}</p>,
-                        ul: ({ children }) => <ul className="list-disc list-inside space-y-1 text-gray-100 mb-2">{children}</ul>,
-                        ol: ({ children }) => <ol className="list-decimal list-inside space-y-1 text-gray-100 mb-2">{children}</ol>,
-                        li: ({ children }) => <li className="text-gray-100">{children}</li>,
+                        p: ({ children }) => <p className="text-gray-100 mb-2 leading-relaxed break-words">{children}</p>,
+                        ul: ({ children }) => <ul className="list-disc list-inside space-y-1 text-gray-100 mb-2 break-words">{children}</ul>,
+                        ol: ({ children }) => <ol className="list-decimal list-inside space-y-1 text-gray-100 mb-2 break-words">{children}</ol>,
+                        li: ({ children }) => <li className="text-gray-100 break-words">{children}</li>,
                         strong: ({ children }) => <strong className="text-yellow-300 font-semibold">{children}</strong>,
                         em: ({ children }) => <em className="text-pink-300">{children}</em>,
                         code: ({ children }) => (
-                          <code className="bg-gray-700 text-green-300 px-1 py-0.5 rounded text-xs font-mono">
+                          <code className="bg-gray-700 text-green-300 px-1 py-0.5 rounded text-xs font-mono break-all">
                             {children}
                           </code>
                         ),
                         pre: ({ children }) => (
-                          <pre className="bg-gray-700 p-3 rounded-lg overflow-x-auto text-sm font-mono text-green-300 mb-2">
+                          <pre className="bg-gray-700 p-3 rounded-lg overflow-x-auto text-sm font-mono text-green-300 mb-2 whitespace-pre-wrap break-words">
                             {children}
                           </pre>
                         ),
                         blockquote: ({ children }) => (
-                          <blockquote className="border-l-4 border-purple-500 pl-3 italic text-gray-300 mb-2">
+                          <blockquote className="border-l-4 border-purple-500 pl-3 italic text-gray-300 mb-2 break-words">
                             {children}
                           </blockquote>
                         ),
@@ -169,7 +178,7 @@ export default function ChatCard({ messages, isGenerating = false }: ChatCardPro
                   >
                     <Loader2 className="w-4 h-4 text-purple-400" />
                   </motion.div>
-                  <span>Estou Analisando a solicitação e gerando código VBA...</span>
+                  <span>Estou analisando a solicitação e gerando código VBA...</span>
                 </div>
               </div>
             </motion.div>
@@ -191,7 +200,7 @@ function BlinkingCursor() {
   )
 }
 
-function TypewriterText({ text, speed = 50 }: { text: string; speed?: number }) {
+function TypewriterText({ text, speed = 15 }: { text: string; speed?: number }) { // Padrão alterado de 50 para 15
   const [displayedText, setDisplayedText] = useState("")
   const [isTyping, setIsTyping] = useState(true)
 
@@ -216,7 +225,7 @@ function TypewriterText({ text, speed = 50 }: { text: string; speed?: number }) 
   }, [text, speed])
 
   return (
-    <span className="leading-relaxed">
+    <span className="leading-relaxed break-words">
       {displayedText}
       {isTyping && <BlinkingCursor />}
     </span>
