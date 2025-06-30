@@ -14,6 +14,7 @@ import {
 import { useTheme } from "next-themes"
 import { useAuth } from "@/contexts/AuthContext"
 import UserMenu from "./UserMenu"
+import UsageIndicator from "./UsageIndicator"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -55,7 +56,12 @@ export default function Header() {
         </motion.h1>
 
         <div className="flex items-center gap-3">
-          {!loading && user && <UserMenu />}
+          {!loading && user && (
+            <>
+              <UsageIndicator />
+              <UserMenu />
+            </>
+          )}
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

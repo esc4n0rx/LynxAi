@@ -2,13 +2,8 @@
 
 import { motion, AnimatePresence } from "framer-motion"
 import { useEffect, useState, useRef } from "react"
-import { Bot, User } from "lucide-react"
-
-interface Message {
-  id: number
-  text: string
-  isUser: boolean
-}
+import { Bot, User, Loader2 } from "lucide-react"
+import type { Message } from "@/types/api"
 
 const containerVariants = {
   hidden: { opacity: 1 },
@@ -26,13 +21,18 @@ const itemVariants = {
     opacity: 1,
     y: 0,
     transition: {
-      type: "spring",
+      type: "spring" as const,
       stiffness: 100,
     },
   },
 }
 
-export default function ChatCard({ messages }: { messages: Message[] }) {
+interface ChatCardProps {
+  messages: Message[]
+  isGenerating?: boolean
+}
+
+export default function ChatCard({ messages, isGenerating = false }: ChatCardProps) {
   const scrollRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -54,7 +54,15 @@ export default function ChatCard({ messages }: { messages: Message[] }) {
         <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-purple-600 to-pink-600 flex items-center justify-center">
           <Bot className="text-white w-5 h-5" />
         </div>
-        <h3 className="text-xl font-semibold text-white">AI Assistant</h3>
+        <h3 className="text-xl font-semibold text-white">Lynx AI Assistant</h3>
+        {isGenerating && (
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+          >
+            <Loader2 className="w-4 h-4 text-purple-400" />
+          </motion.div>
+        )}
       </div>
 
       <div
@@ -92,7 +100,15 @@ export default function ChatCard({ messages }: { messages: Message[] }) {
                     : "bg-gray-800 text-white rounded-bl-none"
                 }`}
               >
-                <TypewriterText text={message.text} speed={25} />
+                <TypewriterText text={message.text} speed={20} />
+                {message.timestamp && (
+                  <div className="text-xs text-gray-400 mt-1">
+                    {message.timestamp.toLocaleTimeString('pt-BR', { 
+                      hour: '2-digit', 
+                      minute: '2-digit' 
+                    })}
+                  </div>
+                )}
               </div>
               {message.isUser && (
                 <div className="w-7 h-7 rounded-full bg-gray-700 flex items-center justify-center shrink-0">
@@ -101,6 +117,29 @@ export default function ChatCard({ messages }: { messages: Message[] }) {
               )}
             </motion.div>
           ))}
+          
+          {isGenerating && messages.length === 0 && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="flex items-center gap-3 justify-start"
+            >
+              <div className="w-7 h-7 rounded-full bg-gradient-to-tr from-purple-500 to-pink-500 flex items-center justify-center shrink-0">
+                <Bot className="w-4 h-4 text-white" />
+              </div>
+              <div className="bg-gray-800 text-white rounded-xl rounded-bl-none p-3">
+                <div className="flex items-center gap-2">
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                  >
+                    <Loader2 className="w-4 h-4 text-purple-400" />
+                  </motion.div>
+                  <span>Gerando resposta...</span>
+                </div>
+              </div>
+            </motion.div>
+          )}
         </motion.div>
       </div>
     </motion.div>
