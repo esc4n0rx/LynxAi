@@ -1,9 +1,17 @@
 "use client"
 
-import { motion } from "framer-motion"
-import { useEffect, useState } from "react"
+import {
+  motion,
+  MotionValue,
+  useAnimationFrame,
+  motionValue,
+  useMotionValue,
+  useSpring,
+  useTransform,
+} from "framer-motion"
+import { useEffect, useRef, useState } from "react"
 
-interface Particle {
+interface ParticleData {
   id: number
   x: number
   y: number
@@ -11,20 +19,149 @@ interface Particle {
   size: number
   delay: number
   intensity: number
+  motionX: MotionValue<number>
+  motionY: MotionValue<number>
+  motionScale: MotionValue<number>
+}
+
+function Particle({
+  particle,
+  isExpanded,
+}: {
+  particle: ParticleData
+  isExpanded: boolean
+}) {
+  const { size, intensity, delay, motionX, motionY, motionScale } = particle
+
+  if (isExpanded) {
+    return (
+      <motion.div
+        className="absolute rounded-full"
+        style={{
+          x: motionX,
+          y: motionY,
+          width: size * 2,
+          height: size * 2,
+          left: "50%",
+          top: "25%",
+          background: `radial-gradient(circle, rgba(168, 85, 247, ${intensity}) 0%, rgba(236, 72, 153, ${
+            intensity * 0.8
+          }) 50%, transparent 70%)`,
+          boxShadow: `0 0 ${size * 3}px rgba(168, 85, 247, ${intensity}), 0 0 ${
+            size * 6
+          }px rgba(236, 72, 153, ${intensity * 0.5})`,
+        }}
+        initial={{
+          scale: motionScale.get(),
+          opacity: intensity,
+        }}
+        animate={{
+          x: [
+            motionX.get(),
+            motionX.get() * 3 + (Math.random() - 0.5) * 800,
+            motionX.get() * 8 + (Math.random() - 0.5) * 1600,
+          ],
+          y: [
+            motionY.get(),
+            motionY.get() * 3 + (Math.random() - 0.5) * 800,
+            motionY.get() * 8 + (Math.random() - 0.5) * 1600,
+          ],
+          scale: [motionScale.get(), motionScale.get() * 2, 0],
+          opacity: [intensity, intensity * 0.7, 0],
+        }}
+        transition={{
+          duration: 3,
+          delay: delay * 0.3,
+          ease: [0.25, 0.46, 0.45, 0.94],
+        }}
+      />
+    )
+  }
+
+  return (
+    <motion.div
+      className="absolute rounded-full"
+      style={{
+        x: motionX,
+        y: motionY,
+        scale: motionScale,
+        width: size,
+        height: size,
+        left: "50%",
+        top: "50%",
+        background: `radial-gradient(circle, rgba(255, 255, 255, ${intensity}) 0%, rgba(168, 85, 247, ${
+          intensity * 0.8
+        }) 30%, rgba(236, 72, 153, ${intensity * 0.6}) 60%, transparent 100%)`,
+        boxShadow: `0 0 ${size * 2}px rgba(168, 85, 247, ${intensity}), 0 0 ${
+          size * 4
+        }px rgba(236, 72, 153, ${intensity * 0.5})`,
+      }}
+    />
+  )
 }
 
 export default function ModernSphere3D({ isExpanded }: { isExpanded: boolean }) {
-  const [particles, setParticles] = useState<Particle[]>([])
-  const [rotation, setRotation] = useState(0)
+  const [particles, setParticles] = useState<ParticleData[]>([])
+  const containerRef = useRef<HTMLDivElement>(null)
+
+  const mouse = {
+    x: useMotionValue(0.5),
+    y: useMotionValue(0.5),
+  }
+
+  const smoothMouse = {
+    x: useSpring(mouse.x, { stiffness: 75, damping: 100, mass: 3 }),
+    y: useSpring(mouse.y, { stiffness: 75, damping: 100, mass: 3 }),
+  }
+
+  const rotateX = useTransform(smoothMouse.y, [0, 1], [-0.5, 0.5])
+  const rotateY = useTransform(smoothMouse.x, [0, 1], [-0.5, 0.5])
+
+  useAnimationFrame((time) => {
+    const baseRotation = time / 15000
+    const rX = rotateX.get()
+    const rY = baseRotation + rotateY.get()
+
+    particles.forEach((particle) => {
+      const { x, y, z } = particle
+      const cosRX = Math.cos(rX)
+      const sinRX = Math.sin(rX)
+      const cosRY = Math.cos(rY)
+      const sinRY = Math.sin(rY)
+
+      const rotatedY_X = x * cosRY - z * sinRY
+      const rotatedY_Z = x * sinRY + z * cosRY
+
+      const rotatedX_Y = y * cosRX - rotatedY_Z * sinRX
+      const finalZ = y * sinRX + rotatedY_Z * cosRX
+
+      const perspective = 400
+      const scale = Math.max(0, perspective / (perspective + finalZ))
+
+      const projectedX = rotatedY_X * scale
+      const projectedY = rotatedX_Y * scale
+
+      particle.motionX.set(projectedX)
+      particle.motionY.set(projectedY)
+      particle.motionScale.set(scale)
+    })
+  })
 
   useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      const { innerWidth, innerHeight } = window
+      mouse.x.set(e.clientX / innerWidth)
+      mouse.y.set(e.clientY / innerHeight)
+    }
+
+    window.addEventListener("mousemove", handleMouseMove)
+
     const generateSphereParticles = () => {
-      const newParticles: Particle[] = []
-      const particleCount = 200
+      const newParticles: ParticleData[] = []
+      const particleCount = 300
       const radius = 130
 
       for (let i = 0; i < particleCount; i++) {
-        // Distribuição esférica mais uniforme
         const phi = Math.acos(-1 + (2 * i) / particleCount)
         const theta = Math.sqrt(particleCount * Math.PI) * phi
 
@@ -37,9 +174,12 @@ export default function ModernSphere3D({ isExpanded }: { isExpanded: boolean }) 
           x,
           y,
           z,
-          size: 1.5 + Math.random() * 3.5,
+          size: 1.5 + Math.random() * 2.5,
           delay: Math.random() * 3,
           intensity: 0.6 + Math.random() * 0.4,
+          motionX: motionValue(0),
+          motionY: motionValue(0),
+          motionScale: motionValue(1),
         })
       }
 
@@ -48,66 +188,15 @@ export default function ModernSphere3D({ isExpanded }: { isExpanded: boolean }) 
 
     generateSphereParticles()
 
-    // Rotação contínua mais suave
-    const rotationInterval = setInterval(() => {
-      setRotation((prev) => prev + 0.3)
-    }, 50)
-
-    return () => clearInterval(rotationInterval)
-  }, [])
+    return () => window.removeEventListener("mousemove", handleMouseMove)
+  }, [mouse.x, mouse.y])
 
   if (isExpanded) {
     return (
       <div className="fixed inset-0 pointer-events-none overflow-hidden z-10">
-        {particles.map((particle) => {
-          const rotatedX = particle.x * Math.cos(rotation * 0.01) - particle.z * Math.sin(rotation * 0.01)
-          const rotatedZ = particle.x * Math.sin(rotation * 0.01) + particle.z * Math.cos(rotation * 0.01)
-
-          const perspective = 400
-          const scale = perspective / (perspective + rotatedZ)
-          const projectedX = rotatedX * scale
-          const projectedY = particle.y * scale
-
-          return (
-            <motion.div
-              key={particle.id}
-              className="absolute rounded-full"
-              style={{
-                width: particle.size * scale * 2,
-                height: particle.size * scale * 2,
-                left: "50%",
-                top: "25%",
-                background: `radial-gradient(circle, rgba(168, 85, 247, ${particle.intensity}) 0%, rgba(236, 72, 153, ${particle.intensity * 0.8}) 50%, transparent 70%)`,
-                boxShadow: `0 0 ${particle.size * 3}px rgba(168, 85, 247, ${particle.intensity}), 0 0 ${particle.size * 6}px rgba(236, 72, 153, ${particle.intensity * 0.5})`,
-              }}
-              initial={{
-                x: projectedX,
-                y: projectedY,
-                scale: scale,
-                opacity: particle.intensity,
-              }}
-              animate={{
-                x: [
-                  projectedX,
-                  projectedX * 3 + (Math.random() - 0.5) * 800,
-                  projectedX * 8 + (Math.random() - 0.5) * 1600,
-                ],
-                y: [
-                  projectedY,
-                  projectedY * 3 + (Math.random() - 0.5) * 800,
-                  projectedY * 8 + (Math.random() - 0.5) * 1600,
-                ],
-                scale: [scale, scale * 2, 0],
-                opacity: [particle.intensity, particle.intensity * 0.7, 0],
-              }}
-              transition={{
-                duration: 3,
-                delay: particle.delay * 0.3,
-                ease: [0.25, 0.46, 0.45, 0.94],
-              }}
-            />
-          )
-        })}
+        {particles.map((particle) => (
+          <Particle key={particle.id} particle={particle} isExpanded={true} />
+        ))}
 
         {/* Ondas de choque da explosão */}
         {[...Array(3)].map((_, i) => (
@@ -141,7 +230,7 @@ export default function ModernSphere3D({ isExpanded }: { isExpanded: boolean }) 
   }
 
   return (
-    <div className="relative mb-12">
+    <div className="relative mb-12" ref={containerRef}>
       <motion.div
         className="relative w-96 h-96 mx-auto"
         animate={{
@@ -172,42 +261,9 @@ export default function ModernSphere3D({ isExpanded }: { isExpanded: boolean }) 
           }}
         />
 
-        {particles.map((particle) => {
-          const rotatedX = particle.x * Math.cos(rotation * 0.01) - particle.z * Math.sin(rotation * 0.01)
-          const rotatedZ = particle.x * Math.sin(rotation * 0.01) + particle.z * Math.cos(rotation * 0.01)
-
-          const perspective = 400
-          const scale = perspective / (perspective + rotatedZ)
-          const projectedX = rotatedX * scale
-          const projectedY = particle.y * scale
-
-          return (
-            <motion.div
-              key={particle.id}
-              className="absolute rounded-full"
-              style={{
-                width: particle.size * scale,
-                height: particle.size * scale,
-                left: "50%",
-                top: "50%",
-                background: `radial-gradient(circle, rgba(255, 255, 255, ${particle.intensity}) 0%, rgba(168, 85, 247, ${particle.intensity * 0.8}) 30%, rgba(236, 72, 153, ${particle.intensity * 0.6}) 60%, transparent 100%)`,
-                boxShadow: `0 0 ${particle.size * 2}px rgba(168, 85, 247, ${particle.intensity}), 0 0 ${particle.size * 4}px rgba(236, 72, 153, ${particle.intensity * 0.5})`,
-                zIndex: Math.round(scale * 100),
-              }}
-              animate={{
-                x: [projectedX, projectedX * 1.08, projectedX],
-                y: [projectedY, projectedY * 1.08, projectedY],
-                scale: [scale, scale * 1.1, scale],
-              }}
-              transition={{
-                duration: 4 + particle.delay,
-                repeat: Number.POSITIVE_INFINITY,
-                ease: "easeInOut",
-                delay: particle.delay,
-              }}
-            />
-          )
-        })}
+        {particles.map((particle) => (
+          <Particle key={particle.id} particle={particle} isExpanded={false} />
+        ))}
       </motion.div>
     </div>
   )

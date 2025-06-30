@@ -1,7 +1,8 @@
 "use client"
 
 import { motion, AnimatePresence } from "framer-motion"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
+import { Bot, User } from "lucide-react"
 
 interface Message {
   id: number
@@ -9,66 +10,142 @@ interface Message {
   isUser: boolean
 }
 
+const containerVariants = {
+  hidden: { opacity: 1 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.2,
+    },
+  },
+}
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      type: "spring",
+      stiffness: 100,
+    },
+  },
+}
+
 export default function ChatCard({ messages }: { messages: Message[] }) {
-  const [displayedMessages, setDisplayedMessages] = useState<Message[]>([])
+  const scrollRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    messages.forEach((message, index) => {
-      setTimeout(() => {
-        setDisplayedMessages((prev) => [...prev, message])
-      }, index * 500)
-    })
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight
+    }
   }, [messages])
 
   return (
     <motion.div
-      initial={{ opacity: 0, x: -50 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.6 }}
-      className="bg-gray-900/50 backdrop-blur-sm border border-gray-700 rounded-2xl p-6 h-96 overflow-hidden"
+      initial={{ opacity: 0, y: 20, scale: 0.95 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ duration: 0.5, ease: "easeOut" }}
+      className="relative bg-gray-900/50 backdrop-blur-lg border border-gray-700/50 rounded-2xl p-6 h-96 overflow-hidden group"
     >
-      <h3 className="text-xl font-semibold mb-4 text-white">🧠 AI Assistant</h3>
+      <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-purple-500/10 via-transparent to-pink-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
-      <div className="h-full overflow-y-auto space-y-4">
-        <AnimatePresence>
-          {displayedMessages.map((message) => (
+      <div className="flex items-center gap-3 mb-4 z-10 relative">
+        <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-purple-600 to-pink-600 flex items-center justify-center">
+          <Bot className="text-white w-5 h-5" />
+        </div>
+        <h3 className="text-xl font-semibold text-white">AI Assistant</h3>
+      </div>
+
+      <div
+        ref={scrollRef}
+        className="h-full overflow-y-auto space-y-4 pr-2 -mr-4"
+        style={{
+          scrollbarWidth: "thin",
+          scrollbarColor: "rgba(156, 163, 175, 0.5) transparent",
+        }}
+      >
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          className="space-y-4"
+        >
+          {messages.map((message) => (
             <motion.div
               key={message.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className={`flex ${message.isUser ? "justify-end" : "justify-start"}`}
+              variants={itemVariants}
+              layout
+              className={`flex items-start gap-3 ${
+                message.isUser ? "justify-end" : "justify-start"
+              }`}
             >
+              {!message.isUser && (
+                <div className="w-7 h-7 rounded-full bg-gradient-to-tr from-purple-500 to-pink-500 flex items-center justify-center shrink-0">
+                  <Bot className="w-4 h-4 text-white" />
+                </div>
+              )}
               <div
-                className={`max-w-[80%] p-3 rounded-2xl ${
-                  message.isUser ? "bg-gray-700 text-white" : "bg-gray-800 text-white"
+                className={`max-w-[80%] p-3 rounded-xl ${
+                  message.isUser
+                    ? "bg-blue-600/50 text-white rounded-br-none"
+                    : "bg-gray-800 text-white rounded-bl-none"
                 }`}
               >
-                <TypewriterText text={message.text} speed={30} />
+                <TypewriterText text={message.text} speed={25} />
               </div>
+              {message.isUser && (
+                <div className="w-7 h-7 rounded-full bg-gray-700 flex items-center justify-center shrink-0">
+                  <User className="w-4 h-4 text-white" />
+                </div>
+              )}
             </motion.div>
           ))}
-        </AnimatePresence>
+        </motion.div>
       </div>
     </motion.div>
   )
 }
 
+function BlinkingCursor() {
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: [0, 1, 0] }}
+      transition={{ duration: 1, repeat: Infinity }}
+      className="inline-block w-0.5 h-4 bg-white ml-1"
+    />
+  )
+}
+
 function TypewriterText({ text, speed = 50 }: { text: string; speed?: number }) {
   const [displayedText, setDisplayedText] = useState("")
+  const [isTyping, setIsTyping] = useState(true)
 
   useEffect(() => {
+    setDisplayedText("")
+    setIsTyping(true)
     let index = 0
     const timer = setInterval(() => {
       if (index < text.length) {
-        setDisplayedText(text.slice(0, index + 1))
+        setDisplayedText((prev) => prev + text.charAt(index))
         index++
       } else {
         clearInterval(timer)
+        setIsTyping(false)
       }
     }, speed)
 
-    return () => clearInterval(timer)
+    return () => {
+      clearInterval(timer)
+      setIsTyping(false)
+    }
   }, [text, speed])
 
-  return <span>{displayedText}</span>
+  return (
+    <span>
+      {displayedText}
+      {isTyping && <BlinkingCursor />}
+    </span>
+  )
 }
